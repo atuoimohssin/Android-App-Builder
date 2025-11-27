@@ -2,7 +2,7 @@
 # اسم سير العمل الذي سيظهر في علامة تبويب Actions
 name: Android CI Build and Upload Debug APK
 
-# متى يتم تشغيل سير العمل؟ (عند أي push على الفرعين main أو master)
+# متى يتم تشغيل سير العمل؟
 on:
   push:
     branches: [ main, master ]
@@ -21,7 +21,7 @@ jobs:
     - name: 1. Checkout Code
       uses: actions/checkout@v4 
 
-    # 2. إعداد بيئة Java Development Kit (JDK) المطلوبة
+    # 2. إعداد بيئة Java Development Kit (JDK)
     - name: 2. Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -30,7 +30,6 @@ jobs:
         cache: 'gradle' 
 
     # 3. منح صلاحيات التنفيذ لملف gradlew 
-    # (هذه الخطوة مهمة بعد استبدال الملفات التنفيذية)
     - name: 3. Make gradlew executable
       run: chmod +x ./gradlew 
 
@@ -38,10 +37,11 @@ jobs:
     - name: 4. Build Debug APK
       run: ./gradlew assembleDebug
 
-    # 5. رفع ملف APK الناتج إلى قسم Artifacts
+    # 5. رفع ملف APK الناتج إلى قسم Artifacts (معدل لحل مشكلة المسار)
     - name: 5. Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-debug-apk 
-        # المسار المُحسّن: يبحث عن أي ملف ينتهي بـ .apk في هذا المجلد 
-        path: app/build/outputs/apk/debug/*.apk
+        # المسار المُحسّن: يبحث عن أي ملف ينتهي بـ .apk في جميع مسارات apk
+        path: |
+          app/build/outputs/apk/**/*.apk 
