@@ -1,31 +1,47 @@
-# .github/workflows/android_build.yml
-
+# .github/workflows/main.yml
+# اسم سير العمل الذي سيظهر في علامة تبويب Actions
 name: Android CI Build and Upload Debug APK
 
+# متى يتم تشغيل سير العمل؟ (عند أي push على الفرعين main أو master)
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
+# --- خطوات البناء ---
 jobs:
   build:
+    # بيئة التشغيل المستخدمة (Linux)
     runs-on: ubuntu-latest 
+
     steps:
+    
+    # 1. سحب كود المشروع من GitHub
     - name: 1. Checkout Code
       uses: actions/checkout@v4 
+
+    # 2. إعداد بيئة Java Development Kit (JDK) المطلوبة
     - name: 2. Set up JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
         java-version: '17'
         cache: 'gradle' 
+
+    # 3. منح صلاحيات التنفيذ لملف gradlew 
+    # (هذه الخطوة مهمة بعد استبدال الملفات التنفيذية)
     - name: 3. Make gradlew executable
       run: chmod +x ./gradlew 
+
+    # 4. تنفيذ أمر Gradle لبناء نسخة Debug APK
     - name: 4. Build Debug APK
       run: ./gradlew assembleDebug
+
+    # 5. رفع ملف APK الناتج إلى قسم Artifacts
     - name: 5. Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-debug-apk 
-        path: app/build/outputs/apk/debug/app-debug.apk 
+        # المسار المُحسّن: يبحث عن أي ملف ينتهي بـ .apk في هذا المجلد 
+        path: app/build/outputs/apk/debug/*.apk
