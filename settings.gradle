@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MyAutoBuilderApp"
+rootProject.name = "Test"
 include ':app'
