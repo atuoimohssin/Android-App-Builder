@@ -2,7 +2,6 @@
 
 name: Android CI Build and Upload Debug APK
 
-# تشغيل سير العمل عند الدفع (push) أو طلب السحب (pull_request) إلى الفرع الرئيسي
 on:
   push:
     branches: [ main, master ]
@@ -11,31 +10,20 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # استخدام بيئة بناء لينكس
-
+    runs-on: ubuntu-latest 
     steps:
-    
-    # 1. سحب كود المشروع من GitHub
     - name: 1. Checkout Code
       uses: actions/checkout@v4 
-
-    # 2. إعداد بيئة Java 17 اللازمة للبناء
     - name: 2. Set up JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
         java-version: '17'
         cache: 'gradle' 
-
-    # 3. منح صلاحيات التنفيذ لملف Gradle
     - name: 3. Make gradlew executable
       run: chmod +x ./gradlew 
-
-    # 4. بناء ملف Debug APK (هذه هي خطوة "التحويل" التي تولد ملف APK)
     - name: 4. Build Debug APK
       run: ./gradlew assembleDebug
-
-    # 5. رفع ملف APK الناتج إلى GitHub كـ "Artifact" للتحميل
     - name: 5. Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
       with:
