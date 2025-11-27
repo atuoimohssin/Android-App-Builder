@@ -1,1 +1,46 @@
 
+# .github/workflows/android_build.yml
+
+name: Android CI Build and Upload APK
+
+# هذا سير العمل يتم تشغيله عند الدفع (push) أو طلب السحب (pull_request) إلى الفرع الرئيسي
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+# تتكون العملية من "وظيفة" واحدة للبناء
+jobs:
+  build:
+    # يتم تشغيل هذه الوظيفة على أحدث نظام تشغيل أوبونتو (Linux)
+    runs-on: ubuntu-latest 
+
+    steps:
+    
+    # 1. سحب الكود من مستودع GitHub
+    - name: 1. Checkout Code
+      uses: actions/checkout@v4 
+
+    # 2. إعداد بيئة Java اللازمة لبناء الأندرويد (JDK 17)
+    - name: 2. Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        cache: 'gradle' 
+
+    # 3. إعطاء صلاحيات التنفيذ لملف Gradle (ضروري على Linux)
+    - name: 3. Make gradlew executable
+      run: chmod +x ./gradlew 
+
+    # 4. بناء ملف APK لنسخة Debug (هذه هي خطوة "التحويل" التي تولد ملف APK)
+    - name: 4. Build Debug APK
+      run: ./gradlew assembleDebug
+
+    # 5. رفع ملف APK الناتج إلى GitHub كـ "Artifact"
+    - name: 5. Upload Debug APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug-apk 
+        path: app/build/outputs/apk/debug/app-debug.apk 
